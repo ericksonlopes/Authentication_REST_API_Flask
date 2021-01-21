@@ -1,11 +1,13 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
+from blacklist import BLACKLIST
 from resources.auth_test_resource import AuthTestResource
 from resources.users_resource import UserRegister
 
 app = Flask(__name__)
+
 # configurações do banco
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data_users.db'
 app.config['SQLALCHEMT_TRACK_MODIFICATIONS'] = False
@@ -17,7 +19,22 @@ app.config['JWT_SECRET_KEY'] = 'Chavesecreta'
 
 api = Api(app)
 
+# Instancia o objeto
 jwt = JWTManager()
+
+
+# decorador para verificar se o token esta autenticado
+@jwt.token_in_blacklist_loader
+def check_blacklist(token):
+    # verifica se o id do token esta dentro da blacklist retornando True ou False
+    return token['tji'] in BLACKLIST
+
+
+# Se caso o token não esteja autenticado executa a função do decorador
+@jwt.revoked_token_loader
+def token_invalid():
+    return jsonify({'message': "this token has already been logged out"}), 401
+
 
 # Decorar que ativa a função qunado a primeira requests for feita
 @app.before_first_request
