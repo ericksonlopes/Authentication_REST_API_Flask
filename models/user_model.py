@@ -6,9 +6,24 @@ class UserModel(data.Model):
     __tablename__ = 'users'
 
     user_id = data.Column(data.Integer, primary_key=True)
-    name = data.Column(data.String(40), UNIQUE=True)
+    login = data.Column(data.String(40), UNIQUE=True)
     password = data.Column(data.String(40))
 
     def __init__(self, login, password):
         self.login = login
         self.password = password
+
+    # Retorna os dados recebido no __init__ em json
+    def json(self):
+        return {
+            "user_id": self.user_id,
+            "login": self.login
+        }
+
+    @classmethod
+    def find_by_login(cls, login):
+        user = cls.query_find_by(login=login).first()
+        if user:
+            return user
+        return False
+
