@@ -1,3 +1,4 @@
+from flask_jwt_extended import create_access_token
 from flask_restful import Resource, reqparse
 from werkzeug.security import safe_str_cmp
 
@@ -26,8 +27,11 @@ class UserLogin(Resource):
     def post(cls):
         # Recebo os dados recebidos no data do post
         dados = arguments.parse_args()
-
+        # pesquisa o login dentro
         user = UserModel.find_by_login(dados['login'])
-        # verifica se o login do usuario E se a senha for compativel com a do user do banco
+        # Se a o usuario existir e a senha for compativel com a do usuario dentro do sistema, cria um token ao usuario
         if user and safe_str_cmp(user.password, dados['senha']):
-            pass
+            # Cria um token de acesso para o id do usuario logado
+            token_access = create_access_token(identity=user.user_id)
+            # Retorna o token
+            return {'access': token_access}, 200
