@@ -6,7 +6,7 @@ from blacklist import BLACKLIST
 from models.user_model import UserModel
 
 arguments = reqparse.RequestParser()
-arguments.add_argument('name', type=str, required=True, help="The filnds 'Login' cannot be left blank")
+arguments.add_argument('login', type=str, required=True, help="The filnds 'Login' cannot be left blank")
 arguments.add_argument('password', type=str, required=True, help="The filnds 'password' cannot be left blank")
 
 
@@ -15,7 +15,7 @@ class User(Resource):
         user = UserModel.find_user(user_id)
         if user:
             return user.json()
-        return {'message', 'User not found'}
+        return {'message': 'User not found'}
 
     # decorar para que a requisição só seja feita por usuario autenticado
     @jwt_required
@@ -27,10 +27,10 @@ class User(Resource):
             try:
                 # Tenta deletar o usuário
                 user.delete_user()
-                return {'message': f"User '{user.login}' deleted."}
+                return {'message': f"User deleted."}
             except Exception as error:
-                return {'message error': f'{error}'}
-        return {'message': f'User {user} not found.'}
+                return {'message error': f'Erro ao Deletar os dados {error}'}
+        return {'message': f'User not found.'}
 
 
 # classe para Registrar usuario
@@ -42,7 +42,7 @@ class UserRegister(Resource):
         # Pesquisa se o login do usuario ja existe no sistema
         if UserModel.find_by_login(dados['login']):
             # se caso existir exibe uma mensagem
-            return {'message', f"The login '{dados['login']}' already exists"}
+            return {'message': f"The login '{dados['login']}' already exists"}
 
         # caso não exista tenta criar
         try:
@@ -63,7 +63,7 @@ class UserLogin(Resource):
         # pesquisa o login dentro
         user = UserModel.find_by_login(dados['login'])
         # Se a o usuario existir e a senha for compativel com a do usuario dentro do sistema, cria um token ao usuario
-        if user and safe_str_cmp(user.password, dados['senha']):
+        if user and safe_str_cmp(user.password, dados['password']):
             # Cria um token de acesso para o id do usuario logado
             token_access = create_access_token(identity=user.user_id)
             # Retorna o token
