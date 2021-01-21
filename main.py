@@ -4,7 +4,7 @@ from flask_restful import Api
 
 from blacklist import BLACKLIST
 from resources.auth_test_resource import AuthTestResource
-from resources.users_resource import UserRegister, UserLogin
+from resources.users_resource import UserRegister, UserLogin, UserLogout
 
 app = Flask(__name__)
 
@@ -45,7 +45,7 @@ def create_db():
 api.add_resource(AuthTestResource, 'test/')
 api.add_resource(UserRegister, 'register/')
 api.add_resource(UserLogin, 'login/')
-# api.add_resource(UserLogout, 'logout/')
+api.add_resource(UserLogout, 'logout/')
 
 if __name__ == '__main__':
     from sql_alchemy import data
